@@ -74,7 +74,7 @@ function slack_start() {
     bot.signal('slack.userlist', data.members);
   });
 
-  axios.get(`https://slack.com/api/conversations.list?token=${process.env.STOKEN}`).then(({ data }) => bot.signal('slack.imlist', data.ims));
+  axios.get(`https://slack.com/api/conversations.list?token=${process.env.STOKEN}`).then(({ data }) => bot.signal('slack.imlist', data.channels));
 
   axios.get(`https://slack.com/api/rtm.connect?token=${process.env.STOKEN}`).then(({ data }) => {
     let alive = true, ping;
@@ -108,20 +108,6 @@ function slack_start() {
               discord_queue.push([ts, ['content', content]]);
               discord_awake();
               if (text[0] === '!') bot.run(res, user, ...text.split(/\s+/))
-            }
-            else {
-              files.forEach((file) => {
-                if (file.size > +process.env.LIMIT) {
-                  discord_queue.push([ts, ['content', `${content}\n${file.url_private}`]]);
-                  discord_awake();
-                }
-                else {
-                  axios.get(file.url_private, { responseType: 'stream' }).then(({ data }) => {
-                    discord_queue.push([ts, ['content', content], ['file', data, file.title]]);
-                    discord_awake();
-                  });
-                }
-              });
             }
           }
           else {
@@ -176,18 +162,6 @@ function discord_start() {
               text,
             }));
             if (d.content[0] === '!') bot.run(res, d.author.id, ...d.content.split(/\s+/));
-          }
-          else {
-            const p = recent.find(e => e && e[1] === id);
-            if (p) {
-              const [ts] = p;
-              axios.post(`https://slack.com/api/chat.update`, qs.stringify({
-                token: process.env.STOKEN,
-                channel: process.env.SCHANNEL,
-                text,
-                ts,
-              }));
-            }
           }
         }
         if (t === 'GUILD_CREATE') {
