@@ -74,7 +74,7 @@ function slack_start() {
     bot.signal('slack.userlist', data.members);
   });
 
-  axios.get(`https://slack.com/api/im.list?token=${process.env.STOKEN}`).then(({ data }) => bot.signal('slack.imlist', data.ims));
+  axios.get(`https://slack.com/api/conversations.list?token=${process.env.STOKEN}`).then(({ data }) => bot.signal('slack.imlist', data.ims));
 
   axios.get(`https://slack.com/api/rtm.connect?token=${process.env.STOKEN}`).then(({ data }) => {
     let alive = true, ping;
