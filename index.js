@@ -92,7 +92,7 @@ function slack_start() {
     });
     slack.on('message', (data) => {
       try {
-        let { ok, reply_to, type, subtype, channel, user, text, message, ts } = JSON.parse(data);
+        let { ok, reply_to, type, subtype, channel, user, text, message, files, ts } = JSON.parse(data);
         if (ok) append([ts, reply_to]);
         if (type === 'message' && channel === process.env.SCHANNEL && (!subtype || subtype === 'message_changed')) {
           if (subtype) {
